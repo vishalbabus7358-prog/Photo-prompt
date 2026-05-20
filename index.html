@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Prompts | AI Prompts & Assets Hub</title>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        @import url('https://fonts.cdnfonts.com/css/copperplate');
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Copperplate', sans-serif; background: #0b0f19; color: #fff; text-align: center; padding-bottom: 30px; }
+        
+        /* Header & 3-Dot Menu */
+        .header-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px; max-width: 500px; margin: 0 auto; position: relative; }
+        .menu-btn { background: none; border: none; color: #00d2ff; font-size: 24px; cursor: pointer; padding: 5px; }
+        .dropdown-menu { display: none; position: absolute; top: 60px; right: 20px; background: #161b22; border: 1px solid #30363d; border-radius: 12px; width: 200px; z-index: 1000; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .dropdown-menu a { display: block; color: #fff; padding: 12px 16px; text-decoration: none; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .dropdown-menu a:last-child { border-bottom: none; }
+        .dropdown-menu a:hover { background: rgba(0,210,255,0.1); color: #00d2ff; }
+
+        .hero { padding: 20px 20px 10px; }
+        .hero h1 { color: #00d2ff; font-size: 28px; margin-bottom: 5px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0,210,255,0.3); }
+        .hero p { font-size: 10px; color: #64748b; letter-spacing: 1px; }
+
+        /* Search Bar Style */
+        .search-box { max-width: 470px; margin: 15px auto 25px; padding: 0 15px; position: relative; }
+        .search-box input { width: 100%; background: #161b22; border: 1px solid #30363d; padding: 14px 20px; border-radius: 30px; color: #fff; font-family: sans-serif; font-size: 14px; outline: none; transition: 0.3s; text-align: center; }
+        .search-box input:focus { border-color: #00d2ff; box-shadow: 0 0 15px rgba(0,210,255,0.2); }
+
+        /* Navigation Tabs Style */
+        .tabs-container { display: flex; max-width: 470px; margin: 0 auto 20px; padding: 0 15px; gap: 10px; }
+        .tab-btn { flex: 1; padding: 12px; background: #161b22; border: 1px solid #30363d; border-radius: 12px; color: #8892b0; font-weight: bold; font-size: 11px; cursor: pointer; font-family: 'Copperplate', sans-serif; transition: 0.3s; letter-spacing: 1px; }
+        .tab-btn.active { background: linear-gradient(45deg, #00d2ff, #00a2ff); color: #000; border: none; box-shadow: 0 5px 15px rgba(0,210,255,0.3); }
+
+               .container { padding: 15px; display: grid; gap: 25px; max-width: 500px; margin: 0 auto; }
+        
+        /* Modern Card Upgrade */
+        .card { background: #161b22; border-radius: 20px; overflow: hidden; border: 1px solid #30363d; transition: transform 0.3s, border-color 0.3s; }
+        .card:hover { border-color: #00d2ff; transform: translateY(-3px); }
+        .card-img { width: 100%; height: 210px; object-fit: cover; filter: brightness(0.75); transition: 0.3s; }
+        .card:hover .card-img { filter: brightness(0.9); }
+        
+        .card-content { padding: 20px; text-align: left; background: linear-gradient(to top, #161b22 75%, transparent); margin-top: -60px; position: relative; }
+        .card-content h3 { font-size: 18px; margin-bottom: 6px; color: #00d2ff; letter-spacing: 1px; }
+        .card-content p { font-size: 11px; color: #94a3b8; line-height: 1.5; margin-bottom: 15px; font-family: sans-serif; }
+
+        /* Badges Fix: Overlapping se bachne ke liye position set ki */
+        .badge { 
+            position: absolute; 
+            top: 12px; 
+            left: 12px; 
+            background: rgba(11, 15, 25, 0.85); /* Background matches body dark tone */
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 9px; 
+            font-weight: bold; 
+            letter-spacing: 1px; 
+            border: 1px solid rgba(0, 210, 255, 0.3); 
+            z-index: 5; 
+            color: #00d2ff; 
+            backdrop-filter: blur(5px);
+        }
+
+
+        /* Action Buttons */
+        .action-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; padding: 0 15px 20px; }
+        .btn-main { background: #00d2ff; color: #000; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 11px; text-decoration: none; display: flex; align-items: center; justify-content: center; letter-spacing: 1px; transition: 0.2s; }
+        .btn-main:active { transform: scale(0.95); }
+        .btn-share { background: #25d366; color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; text-decoration: none; transition: 0.2s; }
+        .btn-share:active { transform: scale(0.95); }
+        .btn-copy { background: #334155; color: #fff; border-radius: 10px; border: none; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn-copy:active { transform: scale(0.95); }
+
+        .no-results { color: #64748b; font-size: 13px; padding: 40px 20px; font-family: sans-serif; }
+        .footer { padding: 40px; font-size: 10px; color: #475569; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+    <div class="header-nav">
+        <div style="font-size: 12px; color: #64748b; letter-spacing: 1px;">VIKAS HUB</div>
+        <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+        <div class="dropdown-menu" id="navMenu">
+            <a href="#" onclick="alert('How to use:\n1. Click Explore Style\n2. Choose your favorite image art\n3. Click Copy Prompt\n4. Paste in Bing Image Creator!')">📖 HOW TO USE PROMPT</a>
+            <a href="https://photo-prompt.netlify.app/admin/" target="_blank">⚙️ GO TO ADMIN PANEL</a>
+            <a href="#" onclick="alert('Contact Vikas Kushwaha for business inquiries.')">📞 CONTACT SUPPORT</a>
+        </div>
+    </div>
+
+    <div class="hero">
+        <h1>PHOTO PROMPT</h1>
+        <p>PREMIUM AI PROMPT & EDITING ASSETS</p>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search prompts, PNGs, names, styles..." onkeyup="filterContent()">
+    </div>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" id="tab-prompts" onclick="switchTab('prompts')">AI PROMPTS 🎨</button>
+        <button class="tab-btn" id="tab-assets" onclick="switchTab('assets')">EDITING ASSETS 🎬</button>
+    </div>
+
+    <div class="container" id="cardsGrid"></div>
+
+    <div class="footer">DESIGNED BY VISHAL & VIKAS • 2026</div>
+
+    <script src="projects/ai-prompts/data.js"></script>
+    <script>
+        // Automatic Menu Toggle System
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('navMenu');
+            const btn = document.querySelector('.menu-btn');
+            if (e.target !== menu && e.target !== btn && !menu.contains(e.target)) {
+                menu.style.display = 'none';
+            }
+        });
+
+        // Smart Schema Definition for Automatic Categories
+        let currentType = 'prompts'; 
+        
+        // Sample Category Hub Definitions (Automatic layout sync mapping)
+        const categoriesData = [
+            { id: 1, type: "prompts", category: "Family-Portraits", title: "Family Portraits", desc: "Premium Cinematic Family Portraits", image: "https://i.ibb.co/jkHdd092/2.webp" },
+            { id: 2, type: "prompts", category: "Aesthetic-Girl-Poster-Designs", title: "Aesthetic Girl Poster", desc: "Stylish Double Exposure & Butterfly Art Prompts", image: "https://i.ibb.co/GvMMpwtY/file-00000000e35c71fa86f602f833ebf4cf.png" },
+            { id: 3, type: "prompts", category: "couple", title: "Couple AI Art", desc: "Romantic Viral Couple Name Art Prompts", image: "https://i.ibb.co/vz6M95X/example3.jpg" },
+            // Sample Asset Entries (Automatic Category Detect layout mapping inside panel)
+            { id: 4, type: "assets", category: "Documentary-PNGs", title: "Documentary PNG Pack", desc: "Trending cinematic overlays, dust effects & paper textures for editing", image: "https://i.ibb.co/FHgHwY5/example2.jpg" }
+        ];
+
+        // Switch Tab Logic
+        function switchTab(type) {
+            currentType = type;
+            document.getElementById('tab-prompts').classList.toggle('active', type === 'prompts');
+            document.getElementById('tab-assets').classList.toggle('active', type === 'assets');
+            document.getElementById('searchInput').value = ''; // clear search on tab shift
+            renderCards(categoriesData.filter(item => item.type === type));
+        }
+
+        // Render Cards Matrix to Screen
+        function renderCards(data) {
+            const grid = document.getElementById('cardsGrid');
+            if(data.length === 0) {
+                grid.innerHTML = `<div class="no-results">Bhai, is section me abhi kuch nahi mila! Admin panel se add karo.</div>`;
+                return;
+            }
+            
+            grid.innerHTML = data.map(item => `
+                <div class="card">
+                    <span class="badge">${item.category.toUpperCase().replace(/-/g, ' ')}</span>
+                    <img src="${item.image}" class="card-img" alt="${item.title}">
+                    <div class="card-content">
+                        <h3>${item.title}</h3>
+                        <p>${item.desc}</p>
+                    </div>
+                    <div class="action-row">
+                        <a href="projects/ai-prompts/index.html?cat=${item.category}" class="btn-main">EXPLORE STYLE</a>
+                        <a href="whatsapp://send?text=${encodeURIComponent('Bhai ye dekh ' + item.title + '! 🔥 https://photo-prompt.netlify.app/projects/ai-prompts/index.html?cat=' + item.category)}" class="btn-share">✉</a>
+                        <button class="btn-copy" onclick="copyLink('${item.category}')">📋</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Search Filter Engine
+        function filterContent() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = categoriesData.filter(item => {
+                const matchTab = item.type === currentType;
+                const matchText = item.title.toLowerCase().includes(query) || 
+                                  item.desc.toLowerCase().includes(query) || 
+                                  item.category.toLowerCase().includes(query);
+                return matchTab && matchText;
+            });
+            renderCards(filtered);
+        }
+
+        // Copy Feature Link Router
+        function copyLink(cat) {
+            const siteUrl = "Check out these " + cat.replace(/-/g, " ") + " AI Prompts: https://photo-prompt.netlify.app/projects/ai-prompts/index.html?cat=" + cat;
+            navigator.clipboard.writeText(siteUrl).then(() => {
+                alert(cat.replace(/-/g, " ") + " Category Link Copied with Message!");
+            });
+        }
+
+        // Initialize App Dashboard Setup
+        window.onload = () => {
+            renderCards(categoriesData.filter(item => item.type === 'prompts'));
+            // Netlify Identity Login Controller integration hook
+            if (window.netlifyIdentity) {
+                window.netlifyIdentity.on("init", user => {
+                    if (!user) {
+                        window.netlifyIdentity.on("login", () => { document.location.href = "/admin/"; });
+                    }
+                });
+            }
+        };
+    </script>
+</body>
+</html>

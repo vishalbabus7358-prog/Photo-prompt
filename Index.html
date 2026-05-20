@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Gallery | Vikas Hub</title>
+    
+    <meta id="og-title" property="og:title" content="AI Prompt Gallery">
+    <meta id="og-image" property="og:image" content="https://i.ibb.co/Mks40ghh/1.jpg">
+    <meta property="og:url" content="https://photo-prompt.netlify.app/">
+
+    <style>
+        @import url('https://fonts.cdnfonts.com/css/copperplate');
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Copperplate', sans-serif; background: #0b0f19; color: #fff; padding-bottom: 50px; text-align: center; }
+        .header { padding: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        
+        .card { 
+            background: rgba(255,255,255,0.05); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); 
+            padding: 15px; transition: transform 0.3s ease; 
+        }
+        .card:active { transform: scale(1.05); } 
+        .card img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
+
+        .btn-copy { 
+            background: #00d2ff; color: #000; border: none; padding: 14px; width: 100%; 
+            border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s;
+            font-family: 'Copperplate', sans-serif;
+        }
+        .btn-copy.success { background: #25d366 !important; color: #fff !important; }
+        .nav-link { color: #94a3b8; text-decoration: none; font-size: 12px; border: 1px solid #475569; padding: 6px 18px; border-radius: 20px; display: inline-block; margin-top: 10px; }
+        /* Floating Share Button Style */
+.floating-share {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #25d366; /* WhatsApp Green */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1000;
+    border: none;
+    cursor: pointer;
+    font-family: 'Copperplate', sans-serif;
+}
+.floating-share:active { transform: scale(0.95);
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 id="catTitle" style="color: #00d2ff; letter-spacing: 2px;">GALLERY</h1>
+        <a href="../../index.html" class="nav-link">🏠 BACK TO HUB</a>
+    </div>
+
+    <div class="grid" id="promptGrid"></div>
+
+    <script src="data.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentCat = urlParams.get('cat');
+
+        function loadPrompts() {
+            const grid = document.getElementById('promptGrid');
+            const title = document.getElementById('catTitle');
+            
+            // 1. Filtering logic
+            const filteredData = promptsData.filter(item => item.category === currentCat);
+
+            // 2. Dynamic Thumbnail Logic
+            if (filteredData.length > 0) {
+                const firstItem = filteredData[0];
+                const ogTitle = document.getElementById('og-title');
+                const ogImage = document.getElementById('og-image');
+                
+                if(ogTitle) ogTitle.setAttribute('content', firstItem.category.toUpperCase() + " PROMPTS");
+                if(ogImage) ogImage.setAttribute('content', firstItem.image);
+            }
+
+            // 3. Title update
+            title.innerText = currentCat ? currentCat.toUpperCase().replace("-", " ") : "ALL PROMPTS";
+            
+            // 4. Grid loading logic
+            grid.innerHTML = filteredData.map((item, index) => `
+                <div class="card">
+                    <img src="${item.image}" alt="AI Style">
+                    <h4 style="margin-bottom:12px;">${item.title}</h4>
+                    <p id="p${index}" style="display:none;">${item.prompt}</p>
+                    <button class="btn-copy" onclick="copyPrompt(this, 'p${index}')">COPY PROMPT 📋</button>
+                </div>
+            `).join('');
+        }
+
+        function copyPrompt(btn, id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = "COPIED ✅";
+                btn.classList.add('success');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('success');
+                }, 2000);
+            });
+        }
+        window.onload = loadPrompts;
+        async function shareGallery() {
+    const shareData = {
+        title: document.getElementById('catTitle').innerText,
+        text: 'Bhai, ye mast AI Prompts dekh aur copy kar! 🔥',
+        url: window.location.href 
+    };
+
+    try {
+        // Pehle check karega ki phone ka asli share menu (Instagram/WhatsApp) kaam kar raha hai ya nahi
+        if (navigator.share) {
+            await navigator.share(shareData); 
+        } else {
+            // Agar browser purana hai toh ye alternate link use karega
+            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareData.text + " " + shareData.url)}`;
+            window.open(waUrl, '_blank');
+        }
+    } catch (err) {
+        console.log('Share cancel ya error:', err);
+    }
+}
+
+
+    </script>
+    <button class="floating-share" onclick="shareGallery()">
+    SHARE TO FRIENDS 📲
+</button>
+
+</body>
+</html>
