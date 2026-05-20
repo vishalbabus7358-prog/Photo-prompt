@@ -1,0 +1,21 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "projects/ai-prompts/images"
+public_folder: "/projects/ai-prompts/images"
+
+collections:
+  - name: "categories"
+    label: "Add Category Cards (Home Page)"
+    folder: "projects/ai-prompts"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Section Type", name: "type", widget: "select", options: ["prompts", "assets"]}
+      - {label: "Category ID Number", name: "id", widget: "number"}
+      - {label: "Category Dynamic Slug", name: "category", widget: "string", hint: "Example: Wings-Name (No spaces)"}
+      - {label: "Card Main Title Text", name: "title", widget: "string"}
+      - {label: "Card Description Subtext", name: "desc", widget: "string"}
+      - {label: "Card Cover Image (ImgBB URL)", name: "image", widget: "string"}
+
