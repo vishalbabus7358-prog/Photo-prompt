@@ -97,13 +97,14 @@
     </div>
 
     <div class="tabs-container" id="category-tabs">
-        <button class="tab-btn active" onclick="filterCategory('all')">ALL 🎨</button>
+        <button class="tab-btn active" onclick="filterCategory('all', this)">ALL 🎨</button>
     </div>
 
     <div class="container" id="cardsGrid"></div>
 
     <div class="footer">DESIGNED BY VISHAL & VIKAS • 2026</div>
 
+    <script src="projects/ai-prompts/data.js"></script>
     <script>
         // Automatic Menu Toggle
         function toggleMenu() {
@@ -111,56 +112,57 @@
             menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
         }
 
-        // Hardcoded Sample Data (Backup fallback)
-        const backupData = [
-            { title: "Sample Portrait", category: "3d-animation", description: "Example active layout", image_url: "https://i.ibb.co/jkHdd092/2.webp", prompt_text: "sample prompt text" }
-        ];
-
         let allPromptsData = [];
 
-        // 🌟 GITHUB REPO SE DIRECT LIVE DATA FETCH KARNE KA FUNCTION (Asli Automatic Card Loader)
-        async function loadGitHubCMSData() {
+        // 🌟 LIVE SYSTEM: data.js + GitHub CMS dono ko jodna
+        async function loadAllCombinedData() {
+            let cmsCards = [];
+            
+            // 1. Pehle GitHub CMS se naya data check karo
             try {
-                // Aapke GitHub ki dynamic API jisse saare naye cards automatic load honge
                 const repoUrl = "https://api.github.com/repos/vishalbabus7358-prog/Photo-prompt/contents/_prompts";
                 const res = await fetch(repoUrl);
                 const files = await res.json();
                 
-                let fetchedCards = [];
-
-                // Har ek markdown file ka material decode karke array me daalna
-                for(let file of files) {
-                    if(file.name.endsWith('.md')) {
-                        const fileRes = await fetch(file.download_url);
-                        const content = await fileRes.text();
-                        
-                        // Front-matter parsing (YAML text extractor)
-                        const rawLines = content.split('\n');
-                        let cardObj = {};
-                        rawLines.forEach(line => {
-                            if(line.startsWith('title:')) cardObj.title = line.replace('title:', '').replace(/"/g, '').trim();
-                            if(line.startsWith('category:')) cardObj.category = line.replace('category:', '').replace(/"/g, '').trim();
-                            if(line.startsWith('image_url:')) cardObj.image_url = line.replace('image_url:', '').replace(/"/g, '').trim();
-                            if(line.startsWith('prompt_text:')) cardObj.prompt_text = line.replace('prompt_text:', '').replace(/"/g, '').trim();
-                            if(line.startsWith('description:')) cardObj.description = line.replace('description:', '').replace(/"/g, '').trim();
-                        });
-                        
-                        if(cardObj.title) fetchedCards.push(cardObj);
+                if (Array.isArray(files)) {
+                    for(let file of files) {
+                        if(file.name.endsWith('.md')) {
+                            const fileRes = await fetch(file.download_url);
+                            const content = await fileRes.text();
+                            
+                            const rawLines = content.split('\n');
+                            let cardObj = {};
+                            rawLines.forEach(line => {
+                                if(line.startsWith('title:')) cardObj.title = line.replace('title:', '').replace(/"/g, '').trim();
+                                if(line.startsWith('category:')) cardObj.category = line.replace('category:', '').replace(/"/g, '').trim();
+                                if(line.startsWith('image_url:')) cardObj.image_url = line.replace('image_url:', '').replace(/"/g, '').trim();
+                                if(line.startsWith('prompt_text:')) cardObj.prompt_text = line.replace('prompt_text:', '').replace(/"/g, '').trim();
+                                if(line.startsWith('description:')) cardObj.description = line.replace('description:', '').replace(/"/g, '').trim();
+                            });
+                            if(cardObj.title) cmsCards.push(cardObj);
+                        }
                     }
                 }
-
-                if(fetchedCards.length > 0) {
-                    allPromptsData = fetchedCards;
-                } else {
-                    allPromptsData = backupData;
-                }
-                
             } catch (error) {
-                console.log("GitHub sync failure, loading local fallback matrix.");
-                allPromptsData = backupData;
+                console.log("CMS folders reading skipped or empty.");
             }
 
-            // UI Refresh setup trigger
+            // 2. Purana data.js ka data check karo aur naye formats me convert karo
+            let legacyCards = [];
+            if (typeof categoriesData !== 'undefined' && Array.isArray(categoriesData)) {
+                legacyCards = categoriesData.map(item => ({
+                    title: item.title,
+                    category: item.category || 'other',
+                    description: item.desc || 'Premium Design Pack',
+                    image_url: item.image,
+                    prompt_text: item.prompt_text || 'Premium Prompt'
+                }));
+            }
+
+            // 3. Dono data ko aapas mein jod do (Merge)
+            allPromptsData = [...cmsCards, ...legacyCards];
+
+            // 4. Buttons aur Cards create karo
             generateCategoryButtons(allPromptsData);
             renderCards(allPromptsData);
         }
@@ -179,17 +181,17 @@
             categories.forEach(category => {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn';
-                btn.innerText = category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, ' '); 
+                btn.innerText = category.toUpperCase().replace(/-/g, ' '); 
                 btn.onclick = (e) => filterCategory(category, e.target);
                 tabsContainer.appendChild(btn);
             });
         }
 
-        // 🃏 DYNAMIC CARD MATRIX CREATOR (Ye aapka naya card banayega browser screen par!)
+        // 🃏 DYNAMIC CARD RENDERING (Screen par card banane wala function)
         function renderCards(data) {
             const grid = document.getElementById('cardsGrid');
             if(!data || data.length === 0) {
-                grid.innerHTML = `<div class="no-results">Bhai, koi active card nahi mila! Admin panel se create karo.</div>`;
+                grid.innerHTML = `<div class="no-results">Bhai, koi card nahi mila! Admin panel se add karo.</div>`;
                 return;
             }
             
@@ -202,9 +204,9 @@
                         <p>${item.description || 'Premium Prompt Design Pack'}</p>
                     </div>
                     <div class="action-row">
-                        <a href="#" class="btn-main" onclick="alert('Prompt:\\n\\n${encodeURIComponent(item.prompt_text || '')}')">VIEW PROMPT</a>
+                        <a href="#" class="btn-main" onclick="alert('Prompt Text:\\n\\n${item.prompt_text ? encodeURIComponent(item.prompt_text) : ''}')">VIEW PROMPT</a>
                         <a href="whatsapp://send?text=${encodeURIComponent('Bhai ye dekh ' + item.title + '! 🔥')}" class="btn-share">✉</a>
-                        <button class="btn-copy" onclick="copyPromptText('${item.prompt_text ? item.prompt_text.replace(/'/g, "\\'") : ''}')">📋</button>
+                        <button class="btn-copy" onclick="copyPromptText(\`${item.prompt_text ? item.prompt_text.replace(/`/g, '\\`').replace(/\$/g, '\\$') : ''}\`)">📋</button>
                     </div>
                 </div>
             `).join('');
@@ -227,7 +229,7 @@
             });
         }
 
-        // SEARCH BAR FILTER
+        // SEARCH BAR ENGINE
         function filterContent() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filtered = allPromptsData.filter(item => {
@@ -238,17 +240,17 @@
             renderCards(filtered);
         }
 
-        // PROMPT COPY HANDLER
+        // PROMPT COPY SYSTEM
         function copyPromptText(text) {
             if(!text) { alert("Prompt text khali h!"); return; }
             navigator.clipboard.writeText(text).then(() => {
-                alert("AI Prompt text copied successfully! Go paste in Bing Creator.");
+                alert("AI Prompt copied successfully!");
             });
         }
 
-        // INIT APPS
+        // INIT SETUP ON LOAD
         window.onload = () => {
-            loadGitHubCMSData();
+            loadAllCombinedData();
             if (window.netlifyIdentity) {
                 window.netlifyIdentity.on("init", user => {
                     if (!user) {
@@ -259,5 +261,4 @@
         };
     </script>
 </body>
-    </html>
-    
+</html>
